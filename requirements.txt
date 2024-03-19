@@ -1,3 +1,4 @@
 ipykernel
 tqdm
-csv
+transformers
+sentencepiece
