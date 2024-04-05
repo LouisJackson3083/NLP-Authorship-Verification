@@ -2,3 +2,4 @@ ipykernel
 tqdm
 transformers
 sentencepiece
+torch
