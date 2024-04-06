@@ -3,3 +3,5 @@ tqdm
 transformers
 sentencepiece
 torch
+pandas
+nltk
