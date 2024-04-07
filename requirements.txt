@@ -6,3 +6,4 @@ torch
 pandas
 nltk
 scikit-learn
+emoji
