@@ -1,7 +1,4 @@
-from transformers import T5Tokenizer, T5ForConditionalGeneration
 import pandas as pd
-from datasets import load_dataset
-from tqdm import tqdm
 from sklearn.model_selection import train_test_split
 
 # Feature extraction
@@ -9,8 +6,9 @@ from nltk.tokenize import word_tokenize
 from nltk import pos_tag
 from typing import List
 import re
-import string   
+import string
 import emoji
+
 
 def split_data(
     FIRST_TEXTS: List[str],
@@ -35,9 +33,9 @@ def split_data(
 
     TRAIN_FIRST_TEXTS, TEST_FIRST_TEXTS, TRAIN_SECOND_TEXTS, \
     TEST_SECOND_TEXTS, TRAIN_LABELS, TEST_LABELS = train_test_split(
-        FIRST_TEXTS, 
-        SECOND_TEXTS, 
-        LABELS, 
+        FIRST_TEXTS,
+        SECOND_TEXTS,
+        LABELS,
         test_size=test_split,
         random_state=1234
     )
@@ -53,8 +51,8 @@ def prepareData(csv_filepath: str, verbose: bool = False) -> [List[str], List[st
         csv_filepath: str - the filepath of the csv file to load our authorship verification data from
         verbose: bool
     returns:
-        FIRST_TEXTS: List[str] - list of strings in the first column of csv 
-        SECOND_TEXTS: List[str] - list of strings in the second column of csv 
+        FIRST_TEXTS: List[str] - list of strings in the first column of csv
+        SECOND_TEXTS: List[str] - list of strings in the second column of csv
         LABELS: List[int] - one hot encoded labels for whether the first and second text are from the same author
     """
     FIRST_TEXTS, SECOND_TEXTS, LABELS = [],[],[]
@@ -73,7 +71,6 @@ def prepareData(csv_filepath: str, verbose: bool = False) -> [List[str], List[st
     if verbose: print("Prepared", len(df), "data points.")
 
     return FIRST_TEXTS, SECOND_TEXTS, LABELS
-
 
 
 class Dataset():
@@ -106,13 +103,12 @@ class Dataset():
         self.SECOND_TEXTS = SECOND_TEXTS
         self.LABELS = LABELS
         self.INVALID_INDEXES = []
-    
+
     def ExtractFeatures(self):
         # Extract POS from the texts
-        
-        #wordtokenizer = word_tokenize
-        #pos_tagger=pos_tag
-        
+        # wordtokenizer = word_tokenize
+        # pos_tagger=pos_tag
+
         print("(1/3) Extracting POS . . .")
         self.FIRST_POS = self.ExtractPOS(self.FIRST_TEXTS)
         self.SECOND_POS = self.ExtractPOS(self.SECOND_TEXTS)
@@ -126,7 +122,6 @@ class Dataset():
         self.SECOND_INFORMATION = self.ExtractInformation(self.SECOND_TEXTS)
 
         self.CleanUpData()
-        
 
     def ExtractPOS(self, TEXTS):
         POS = []
@@ -137,14 +132,14 @@ class Dataset():
             try:
                 tags = pos_tag(word_tokenize(text))
                 for word in tags:
-                    curr_POS.append(word)
-            except: # If the text returns invalid, add it to invalid indexes
+                    curr_POS.append(word[1])
+            except:  # If the text returns invalid, add it to invalid indexes
                 self.INVALID_INDEXES.append(index)
                 POS.append([])
-            
+
             POS.append(curr_POS)
         return POS
-    
+
     def ExtractPunctuation(self, TEXTS):
         PUNCTUATION = []
         # Get sets of all punctuation and all emojis
@@ -167,11 +162,11 @@ class Dataset():
                 PUNCTUATION.append([])
         
         return PUNCTUATION
-    
+
     def ExtractInformation(self, TEXTS):
         INFORMATION = []
         pattern = r"(?<=\<).*?(?=\>)"
-        
+
         # Iterate through every text
         for index, text in enumerate(TEXTS):
             try:
@@ -182,7 +177,7 @@ class Dataset():
                 INFORMATION.append([])
 
         return INFORMATION
-    
+
     def CleanUpData(self):
         try: # Before we clean up, let's make sure we actually have all our lists.
             self.FIRST_POS
@@ -210,4 +205,3 @@ class Dataset():
             self.SECOND_INFORMATION.pop(index)
 
         print("Cleaned up all data!")
-
