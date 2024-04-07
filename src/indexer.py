@@ -73,7 +73,7 @@ class Indexer():
         """
         Applies the index-to-value mapping to a list of lists of indices, converting them back to their original values.
         """
-        return [[self.i2i[i] for i in row] for row in indexes]
+        return [[self.i2v[i] for i in row] for row in indexes]
 
     def save(self, v2i_path: str, i2v_path: str) -> None:
         """
