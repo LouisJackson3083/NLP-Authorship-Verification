@@ -1,37 +1,87 @@
-# class INDEXER
-# init function:
-#   takes in vocab (just a list of targets in our case?), sets local variable vocab to it
-#   initializes _vocab2idx and _idx2vocab to None
-#   then finishes the vocab by turning it into a set (0 & 1's ????)
-#
-#   make build_vocab2idx function (stupid ass function)
-#
-#   make save function (writes to json)
-#
-#  
-#
-#
-# class TOKENINDEXED
-# init functions:
-#   pass in itertools chain of FIRST_POS and SECOND_POS as vocabs
-#   creates local vocabs using super INDEXER class
-#   creates pad_index = 0, unknown_index = 1
-#   initializes _vocab2idx and _idx2vocab to None
-#
-#   
-# vocab2idx function:
-#   builds a dictionary with pad and unknown indexes as 0 and 1
-#   does whatever the fuck it does line 64
-#
-# idx2vocab function:
-#   builds inverted dict of vocab2idx (it is literally the inverse lol)
-#
-#
-#
-#
-#
-#
-#
-#
-#
-#
+from typing import List
+from util import write_json
+
+
+POS_PRE = {"<PAD>": 0, "<UNK>": 1}
+"""Default pre-defined value-to-index mapping for POS."""
+
+
+class Indexer():
+    """
+    A class for creating and manipulating indexing schemes that map values to indices and vice versa.
+
+    Attributes:
+        values (list): A list of unique values to be indexed.
+        v2i (dict): property holding the value-to-index mapping
+        i2v (dict): property holding the index-to-value mapping
+        _v2i (list): A private list holding the value-to-index mapping and a boolean indicating if it's finalized.
+        _i2v (list): A private list holding the index-to-value mapping and a boolean indicating if it's finalized.
+    """
+
+    def __init__(self, values: list, pre: dict = None):
+        """
+        Initializes the Indexer with a list of values and an optional pre-defined mapping.
+
+        Parameters:
+            values (list): The list of values to be indexed.
+            pre (dict, optional): An optional dictionary for pre-defined value-to-index mappings.
+        """
+        pre = pre or {}
+        erp = {}
+        for k, v in pre.items():
+            erp[v] = k
+
+        self.values = list(set(values))
+        self._v2i = [pre, False]
+        self._i2v = [erp, False]
+
+    @property
+    def v2i(self) -> dict:
+        """
+        Lazily generates and returns the value-to-index mapping as a dictionary.
+        """
+        if self._v2i[1]:
+            return self._v2i[0]
+
+        for v in self.values:
+            self._v2i[0][v] = len(self._v2i[0])
+
+        self._v2i[1] = True
+        return self._v2i[0]
+
+    @property
+    def i2v(self) -> dict:
+        """
+        Lazily generates and returns the index-to-value mapping as a dictionary.
+        """
+        if self._i2v[1]:
+            return self._i2v[0]
+
+        for v in self.values:
+            self._i2v[0][len(self._i2v[0])] = v
+
+        self._i2v[1] = True
+        return self._i2v[0]
+
+    def apply_v2i(self, values: List[list]):
+        """
+        Applies the value-to-index mapping to a list of lists of values, converting them to their corresponding indices.
+        """
+        return [[self.v2i[v] for v in row] for row in values]
+
+    def apply_i2v(self, indexes: List[list]):
+        """
+        Applies the index-to-value mapping to a list of lists of indices, converting them back to their original values.
+        """
+        return [[self.i2i[i] for i in row] for row in indexes]
+
+    def save(self, v2i_path: str, i2v_path: str) -> None:
+        """
+        Saves the value-to-index and index-to-value mappings to the specified file paths in JSON format.
+
+        Parameters:
+            v2i_path (str): The file path to save the value-to-index mapping.
+            i2v_path (str): The file path to save the index-to-value mapping.
+        """
+        write_json(data=self.v2i, path=v2i_path)
+        write_json(data=self.i2v, path=i2v_path)
