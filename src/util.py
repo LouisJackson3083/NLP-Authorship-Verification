@@ -16,5 +16,5 @@ def convert(obj):
 def write_json(data: list or dict,
                path: str) -> None:
     print(convert(data))
-    with open(path, "w", encoding="utf8") as outfile:
+    with open(path, "w+", encoding="utf8") as outfile:
         json.dump(convert(data), outfile, separators=(",", ":"), indent=4, ensure_ascii=False)

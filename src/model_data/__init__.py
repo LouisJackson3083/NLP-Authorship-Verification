@@ -28,7 +28,7 @@ class ModelDataset(torch.utils.data.Dataset):
         self.max_len = max_len
 
     def __len__(self):
-        return len(self.fst_text)
+        return len(self.fst_texts)
 
     def _pair_tokenizer(self, fst_text: str, snd_text: str):
         batch = self.tokenizer.encode_plus(
@@ -73,6 +73,6 @@ class ModelDataset(torch.utils.data.Dataset):
 
         if self.labels:
             label = self.labels[index]
-            ret["targets"] = torch.tensor(label)
+            ret["labels"] = torch.tensor(label)
 
         return ret

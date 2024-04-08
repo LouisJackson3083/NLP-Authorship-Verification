@@ -1,24 +1,18 @@
 import pandas as pd
 from sklearn.model_selection import train_test_split
-
-# Feature extraction
 from nltk.tokenize import word_tokenize
 from nltk import pos_tag
 from typing import List, Dict
 import re
 import string
 import emoji
+from tqdm.autonotebook import tqdm
+import logging
 
+# Ours
 from indexer import Indexer
 
-try:
-    from IPython import get_ipython
-    if 'IPKernelApp' not in get_ipython().config:
-        raise ImportError("Not in a notebook")
-    from tqdm.notebook import tqdm
-except Exception:
-    from tqdm import tqdm
-import logging
+
 logger = logging.getLogger(__name__)
 
 
@@ -49,7 +43,7 @@ def split_data(
     return train, test
 
 
-def prepare_data(csv_filepath: str) -> [List[str], List[str], List[int]]:
+def prepare_data(csv_filepath: str) -> Dict[str, list]:
     """
     Prepares the data from csv files
     args:
@@ -207,7 +201,7 @@ class PrepDataset():
             self.FIRST_INFORMATION.pop(index)
             self.SECOND_INFORMATION.pop(index)
 
-        print("Cleaned up all data!")
+        logger.info("Cleaned up all data!")
 
     def index_data(self, pos_indexer: Indexer, label_indexer: Indexer = None):
         assert self.prep_state == "extracted"
