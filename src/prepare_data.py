@@ -4,7 +4,7 @@ from sklearn.model_selection import train_test_split
 # Feature extraction
 from nltk.tokenize import word_tokenize
 from nltk import pos_tag
-from typing import List
+from typing import List, Dict
 import re
 import string
 import emoji
@@ -18,13 +18,13 @@ try:
     from tqdm.notebook import tqdm
 except Exception:
     from tqdm import tqdm
+import logging
+logger = logging.getLogger(__name__)
 
 
 def split_data(
-        FIRST_TEXTS: List[str],
-        SECOND_TEXTS: List[str],
-        LABELS: List[int],
-        test_split: float = 0.1
+        full: Dict[str, list],
+        split: float = 0.1
         ) -> [List[str], List[str], List[str], List[str], List[str], List[str]]:
     """
     Splits a set of first and second texts and their labels into a training/test split
@@ -36,24 +36,20 @@ def split_data(
     returns:
         2 sets of data
     """
+    test, train = {}, {}
 
-    # Init test lists and amended lists
-    TEST_FIRST_TEXTS, TEST_SECOND_TEXTS, TEST_LABELS = [], [], []
-    TRAIN_FIRST_TEXTS, TRAIN_SECOND_TEXTS, TRAIN_LABELS = [], [], []
+    train["fst_texts"], test["fst_texts"], train["snd_texts"], test["snd_texts"] = \
+        train_test_split(full["fst_texts"], full["snd_texts"],
+                         test_size=split, random_state=6969)
 
-    TRAIN_FIRST_TEXTS, TEST_FIRST_TEXTS, TRAIN_SECOND_TEXTS, \
-    TEST_SECOND_TEXTS, TRAIN_LABELS, TEST_LABELS = train_test_split(
-        FIRST_TEXTS,
-        SECOND_TEXTS,
-        LABELS,
-        test_size=test_split,
-        random_state=1234
-    )
+    if "labels" in full:
+        train["labels"], test["labels"] = \
+            train_test_split(full["labels"], test_size=split, random_state=6969)
 
-    return TRAIN_FIRST_TEXTS, TRAIN_SECOND_TEXTS, TRAIN_LABELS, TEST_FIRST_TEXTS, TEST_SECOND_TEXTS, TEST_LABELS
+    return train, test
 
 
-def prepare_data(csv_filepath: str, verbose: bool = False) -> [List[str], List[str], List[int]]:
+def prepare_data(csv_filepath: str) -> [List[str], List[str], List[int]]:
     """
     Prepares the data from csv files
     args:
@@ -64,7 +60,7 @@ def prepare_data(csv_filepath: str, verbose: bool = False) -> [List[str], List[s
         SECOND_TEXTS: List[str] - list of strings in the second column of csv
         LABELS: List[int] - one hot encoded labels for whether the first and second text are from the same author
     """
-    FIRST_TEXTS, SECOND_TEXTS, LABELS = [],[],[]
+    FIRST_TEXTS, SECOND_TEXTS, LABELS = [], [], []
 
     # Load the dataframe
     df = pd.read_csv(csv_filepath)
@@ -77,10 +73,9 @@ def prepare_data(csv_filepath: str, verbose: bool = False) -> [List[str], List[s
 
     # Ensure that the data is valid
     assert len(FIRST_TEXTS) == len(SECOND_TEXTS) == len(LABELS)
-    if verbose:
-        print("Prepared", len(df), "data points.")
 
-    return FIRST_TEXTS, SECOND_TEXTS, LABELS
+    logger.info(f"Prepared {len(df)} data points.")
+    return {"fst_texts": FIRST_TEXTS, "snd_texts": SECOND_TEXTS, "labels": LABELS}
 
 
 class PrepDataset():
@@ -108,10 +103,10 @@ class PrepDataset():
         INVALID_INDEXES - a set of indexes that are invalid and should be popped at the end of feature extraction
     """
 
-    def __init__(self, FIRST_TEXTS, SECOND_TEXTS, LABELS=None):
-        self.FIRST_TEXTS = FIRST_TEXTS
-        self.SECOND_TEXTS = SECOND_TEXTS
-        self.LABELS = LABELS
+    def __init__(self, map: dict):
+        self.FIRST_TEXTS = map["fst_texts"]
+        self.SECOND_TEXTS = map["snd_texts"]
+        self.LABELS = map["labels"]
         self.INVALID_INDEXES = []
         self.prep_state = "initial"
 

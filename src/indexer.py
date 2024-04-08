@@ -27,9 +27,7 @@ class Indexer():
             pre (dict, optional): An optional dictionary for pre-defined value-to-index mappings.
         """
         pre = pre or {}
-        erp = {}
-        for k, v in pre.items():
-            erp[v] = k
+        erp = {v: k for k, v in pre.items()}
 
         self.values = list(set(values))
         self._v2i = [pre, False]
