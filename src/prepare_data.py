@@ -9,13 +9,23 @@ import re
 import string
 import emoji
 
+from indexer import Indexer
+
+try:
+    from IPython import get_ipython
+    if 'IPKernelApp' not in get_ipython().config:
+        raise ImportError("Not in a notebook")
+    from tqdm.notebook import tqdm
+except Exception:
+    from tqdm import tqdm
+
 
 def split_data(
-    FIRST_TEXTS: List[str],
-    SECOND_TEXTS: List[str],
-    LABELS: List[int],
-    test_split: float = 0.1
-    ) -> [List[str], List[str], List[str], List[str], List[str], List[str]]:
+        FIRST_TEXTS: List[str],
+        SECOND_TEXTS: List[str],
+        LABELS: List[int],
+        test_split: float = 0.1
+        ) -> [List[str], List[str], List[str], List[str], List[str], List[str]]:
     """
     Splits a set of first and second texts and their labels into a training/test split
     args:
@@ -28,8 +38,8 @@ def split_data(
     """
 
     # Init test lists and amended lists
-    TEST_FIRST_TEXTS, TEST_SECOND_TEXTS, TEST_LABELS = [],[],[]
-    TRAIN_FIRST_TEXTS, TRAIN_SECOND_TEXTS, TRAIN_LABELS = [],[],[]
+    TEST_FIRST_TEXTS, TEST_SECOND_TEXTS, TEST_LABELS = [], [], []
+    TRAIN_FIRST_TEXTS, TRAIN_SECOND_TEXTS, TRAIN_LABELS = [], [], []
 
     TRAIN_FIRST_TEXTS, TEST_FIRST_TEXTS, TRAIN_SECOND_TEXTS, \
     TEST_SECOND_TEXTS, TRAIN_LABELS, TEST_LABELS = train_test_split(
@@ -43,8 +53,7 @@ def split_data(
     return TRAIN_FIRST_TEXTS, TRAIN_SECOND_TEXTS, TRAIN_LABELS, TEST_FIRST_TEXTS, TEST_SECOND_TEXTS, TEST_LABELS
 
 
-
-def prepareData(csv_filepath: str, verbose: bool = False) -> [List[str], List[str], List[int]]:
+def prepare_data(csv_filepath: str, verbose: bool = False) -> [List[str], List[str], List[int]]:
     """
     Prepares the data from csv files
     args:
@@ -65,17 +74,18 @@ def prepareData(csv_filepath: str, verbose: bool = False) -> [List[str], List[st
         FIRST_TEXTS.append(df.iloc[i, 0])
         SECOND_TEXTS.append(df.iloc[i, 1])
         LABELS.append(df.iloc[i, 2])
-    
+
     # Ensure that the data is valid
     assert len(FIRST_TEXTS) == len(SECOND_TEXTS) == len(LABELS)
-    if verbose: print("Prepared", len(df), "data points.")
+    if verbose:
+        print("Prepared", len(df), "data points.")
 
     return FIRST_TEXTS, SECOND_TEXTS, LABELS
 
 
-class Dataset():
+class PrepDataset():
     """
-    For a given dataset, whether that's the training, dev, or 
+    For a given dataset, whether that's the training, dev, or
     test dataset, this class handles most of it's setup and functions.
 
     We will do all tokenization, feature extraction within this class and it will be what we pass to the model etc.
@@ -98,46 +108,42 @@ class Dataset():
         INVALID_INDEXES - a set of indexes that are invalid and should be popped at the end of feature extraction
     """
 
-    def __init__(self, FIRST_TEXTS, SECOND_TEXTS, LABELS):
+    def __init__(self, FIRST_TEXTS, SECOND_TEXTS, LABELS=None):
         self.FIRST_TEXTS = FIRST_TEXTS
         self.SECOND_TEXTS = SECOND_TEXTS
         self.LABELS = LABELS
         self.INVALID_INDEXES = []
+        self.prep_state = "initial"
 
     def ExtractFeatures(self):
-        # Extract POS from the texts
-        # wordtokenizer = word_tokenize
-        # pos_tagger=pos_tag
-
-        print("(1/3) Extracting POS . . .")
         self.FIRST_POS = self.ExtractPOS(self.FIRST_TEXTS)
         self.SECOND_POS = self.ExtractPOS(self.SECOND_TEXTS)
 
-        print("(2/3) Extracting Punctuation . . .")
         self.FIRST_PUNCTUATION = self.ExtractPunctuation(self.FIRST_TEXTS)
         self.SECOND_PUNCTUATION = self.ExtractPunctuation(self.SECOND_TEXTS)
 
-        print("(3/3) Extracting Information . . .")
         self.FIRST_INFORMATION = self.ExtractInformation(self.FIRST_TEXTS)
         self.SECOND_INFORMATION = self.ExtractInformation(self.SECOND_TEXTS)
 
         self.CleanUpData()
+        self.prep_state = "extracted"
 
     def ExtractPOS(self, TEXTS):
         POS = []
         # For each text in the list
-        for index, text in enumerate(TEXTS):
-            curr_POS = []
+        for index, text in tqdm(enumerate(TEXTS), total=len(TEXTS),
+                                leave=False, desc="Extracting POS"):
             # For each word, get it's part of speech
             try:
                 tags = pos_tag(word_tokenize(text))
-                for word in tags:
-                    curr_POS.append(word[1])
-            except:  # If the text returns invalid, add it to invalid indexes
+                POS.append([
+                    token for _word, token in tags
+                ])
+                assert POS[-1] is not []
+            except Exception:
                 self.INVALID_INDEXES.append(index)
                 POS.append([])
 
-            POS.append(curr_POS)
         return POS
 
     def ExtractPunctuation(self, TEXTS):
@@ -152,15 +158,16 @@ class Dataset():
         valid_symbols.remove("<")
 
         pattern = r"(?<=\<).*?(?=\>)"
-        for index, text in enumerate(TEXTS):
+        for index, text in tqdm(enumerate(TEXTS), total=len(TEXTS),
+                                leave=False, desc="Extracting Punctuation"):
             try:
                 text = re.sub(pattern, "", text)
                 punc = " ".join(ch for ch in text if ch in valid_symbols)
                 PUNCTUATION.append(punc)
-            except: # If the text returns invalid, add it to invalid indexes
+            except Exception:
                 self.INVALID_INDEXES.append(index)
                 PUNCTUATION.append([])
-        
+
         return PUNCTUATION
 
     def ExtractInformation(self, TEXTS):
@@ -168,25 +175,26 @@ class Dataset():
         pattern = r"(?<=\<).*?(?=\>)"
 
         # Iterate through every text
-        for index, text in enumerate(TEXTS):
+        for index, text in tqdm(enumerate(TEXTS), total=len(TEXTS),
+                                leave=False, desc="Extracting Information"):
             try:
                 text = re.findall(pattern, text)
                 INFORMATION.append(" ".join(text))
-            except: # If the text returns invalid, add it to invalid indexes
+            except Exception:
                 self.INVALID_INDEXES.append(index)
                 INFORMATION.append([])
 
         return INFORMATION
 
     def CleanUpData(self):
-        try: # Before we clean up, let's make sure we actually have all our lists.
+        try:  # Before we clean up, let's make sure we actually have all our lists.
             self.FIRST_POS
             self.SECOND_POS
             self.FIRST_PUNCTUATION
             self.SECOND_PUNCTUATION
             self.FIRST_INFORMATION
             self.SECOND_INFORMATION
-        except:
+        except Exception:
             print("Not every feature has been extracted. Please check your code and try again.")
             return
 
@@ -205,3 +213,19 @@ class Dataset():
             self.SECOND_INFORMATION.pop(index)
 
         print("Cleaned up all data!")
+
+    def index_data(self, pos_indexer: Indexer, label_indexer: Indexer = None):
+        assert self.prep_state == "extracted"
+
+        # This should be refactored it's silly AF
+        if self.LABELS:
+            assert label_indexer is not None
+            self.LABELS_INDEXED = label_indexer.apply_v2i(
+                [[label] for label in self.LABELS]
+            )
+        else:
+            self.LABELS_INDEXED = None
+
+        self.FIRST_POS_INDEXED = pos_indexer.apply_v2i(self.FIRST_POS)
+        self.SECOND_POS_INDEXED = pos_indexer.apply_v2i(self.SECOND_POS)
+        self.prep_state = "indexed"
