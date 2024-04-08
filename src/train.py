@@ -20,7 +20,7 @@ if __name__ == "__main__":
     # ............. Create Config ..............
     CONFIG = DefaultConfig().parse()
     # could change
-    torch.set_float32_matmul_precision('medium')
+    torch.set_float32_matmul_precision('high')
 
     # ............. Setup Logging ..............
     logging.basicConfig(level=CONFIG.log_level,
