@@ -8,13 +8,13 @@ from pytorch_lightning.loggers import CSVLogger
 import pytorch_lightning as pl
 import torch
 
-from config import DefaultConfig
-from model_data.data_module import DataModule
-import indexer
-import prepare_data as pd
-from models.util import build_checkpoint_callback
-from models.t5 import Classifier
-from util import write_json
+from .config import DefaultConfig
+from .model_data.data_module import DataModule
+from . import indexer
+from . import prepare_data as pd
+from .models.util import build_checkpoint_callback
+from .models.t5 import Classifier
+from .util import write_json
 
 if __name__ == "__main__":
     # ............. Create Config ..............

@@ -10,7 +10,7 @@ from tqdm.autonotebook import tqdm
 import logging
 
 # Ours
-from indexer import Indexer
+from .indexer import Indexer
 
 
 logger = logging.getLogger(__name__)

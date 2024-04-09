@@ -1,5 +1,6 @@
 from typing import List
-from util import write_json
+
+from .util import write_json
 
 
 POS_PRE = {"<PAD>": 0, "<UNK>": 1}

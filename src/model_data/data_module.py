@@ -3,7 +3,7 @@ import argparse
 import transformers
 import torch
 
-from model_data import ModelDataset
+from . import ModelDataset
 
 
 class DataModule(pl.LightningDataModule):

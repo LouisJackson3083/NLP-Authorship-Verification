@@ -16,7 +16,7 @@ class DefaultConfig:
         self.p.add_argument("--num_filters", type=int, default=128)
         self.p.add_argument("--filter_sizes", type=int, default=[1, 2, 3])
         self.p.add_argument("--dropout", type=float, default=0.15)
-        self.p.add_argument("--embedding_dim", type=float, default=128)
+        self.p.add_argument("--embedding_dim", type=float, default=1024)
 
         root = Path(__file__).parents[2].__str__()
         self.p.add_argument("--data_dir", type=str, default=f"{root}/data/")
@@ -25,8 +25,8 @@ class DefaultConfig:
         self.p.add_argument("--asset_dir", type=str, default=f"{root}/assets/")
         self.p.add_argument("--saved_models_dir", type=str, default=f"{root}/assets/saved/")
         self.p.add_argument("--log_level", default=logging.INFO)
-        self.p.add_argument("--best_model_path_file", type=str, default=f"{root}/assets/saved/av/best_model_path.json")
-        self.p.add_argument("--language_model_path", type=str, default="google-t5/t5-small")
+        self.p.add_argument("--best_model_path_file", type=str, default=f"{root}/assets/saved/AV/best_model_path.json")
+        self.p.add_argument("--language_model_path", type=str, default="google-t5/t5-large")
 
     def parse(self):
         return self.p.parse_args()

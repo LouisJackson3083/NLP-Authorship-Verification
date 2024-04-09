@@ -1,6 +1,7 @@
 import torch
 import transformers
-from prepare_data import PrepDataset
+
+from ..prepare_data import PrepDataset
 
 
 class ModelDataset(torch.utils.data.Dataset):
