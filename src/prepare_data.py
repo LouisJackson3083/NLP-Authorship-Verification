@@ -119,6 +119,16 @@ class PrepDataset():
 
     def ExtractPOS(self, TEXTS):
         POS = []
+
+        # Get sets of all punctuation and all emojis
+        all_punctuation = set(string.punctuation)
+        all_emojis = set(emoji.EMOJI_DATA)
+        # We then append both punctuation and emojis to our symbols variable,
+        # and remove the < > tag markers
+        valid_symbols = all_punctuation | all_emojis
+        valid_symbols.remove(">")
+        valid_symbols.remove("<")
+
         # For each text in the list
         for index, text in tqdm(enumerate(TEXTS), total=len(TEXTS),
                                 leave=False, desc="Extracting POS"):
@@ -126,7 +136,7 @@ class PrepDataset():
             try:
                 tags = pos_tag(word_tokenize(text))
                 POS.append([
-                    token for _word, token in tags
+                    token for _word, token in tags if (token not in valid_symbols)
                 ])
                 assert POS[-1] is not []
             except Exception:
