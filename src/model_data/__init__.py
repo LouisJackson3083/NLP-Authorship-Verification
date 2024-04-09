@@ -68,7 +68,7 @@ class ModelDataset(torch.utils.data.Dataset):
         ret = {
             "text": inid,
             "punc": punc,
-            "info": info,
+            # "info": info,
             "ipos": ipos,
         }
 

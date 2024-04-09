@@ -85,10 +85,10 @@ class Classifier(pl.LightningModule):
     def forward(self, batch):
         # ------------- Text, Information and POS feature extraction -----------
         text_features = self.model(batch["text"]).last_hidden_state
-        information_features = self.model(batch["info"]).last_hidden_state
+        # information_features = self.model(batch["info"]).last_hidden_state
         pos_features = self.model(batch["ipos"]).last_hidden_state
 
-        features = torch.cat((text_features, information_features, pos_features), dim=2)
+        features = torch.cat((text_features, pos_features), dim=2)
 
         # ------------------------ Attention Block -------------------------------
         context, attn = self.attention(features, features, features)
