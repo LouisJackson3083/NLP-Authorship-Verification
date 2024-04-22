@@ -1,0 +1,32 @@
+config: !!python/object:argparse.Namespace
+  asset_dir: C:\Users\neoni\OneDrive\Documents\UNI\NLU\NLP-Authorship-Verification/assets/
+  batch_size: 8
+  best_model_path_file: C:\Users\neoni\OneDrive\Documents\UNI\NLU\NLP-Authorship-Verification/assets/saved/av/best_model_path.json
+  data_dev: dev.csv
+  data_dir: C:\Users\neoni\OneDrive\Documents\UNI\NLU\NLP-Authorship-Verification/data/
+  data_test: test.csv
+  data_train: train.csv
+  dropout: 0.15
+  embedding_dim: 128
+  filter_sizes: &id001
+  - 1
+  - 2
+  - 3
+  log_level: 20
+  lr: 2.0e-05
+  mamba: false
+  mamba_language_model_path: state-spaces/mamba-130m-hf
+  max_len: 350
+  model_name: AV
+  num_epochs: 7
+  num_filters: 128
+  num_workers: 10
+  ratio: 0.01
+  save_top_k: 1
+  saved_models_dir: C:\Users\neoni\OneDrive\Documents\UNI\NLU\NLP-Authorship-Verification/assets/saved/
+  t5_language_model_path: google-t5/t5-small
+filter_sizes: *id001
+lr: 2.0e-05
+max_len: 350
+n_filters: 128
+num_classes: 2

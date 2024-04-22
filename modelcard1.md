@@ -38,6 +38,16 @@ Text-to-Text Transformer](https://jmlr.org/papers/volume21/20-074/20-074.pdf)
 - Dev - 6,000 items of text pairs & labels.
 - Test - ?? items of text pairs.
 
+Preprocessing
+Tokenization: The BLOOM tokenizer (link), a learned subword tokenizer trained using:
+
+    A byte-level Byte Pair Encoding (BPE) algorithm
+
+    A simple pre-tokenization rule, no normalization
+
+    A vocabulary size of 250,680
+
+
 ### Training Procedure
 
 The model 

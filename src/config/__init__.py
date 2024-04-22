@@ -24,6 +24,7 @@ class DefaultConfig:
         self.p.add_argument("--data_dir", type=str, default=f"{root}/data/")
         self.p.add_argument("--data_train", type=str, default="train.csv")
         self.p.add_argument("--data_dev", type=str, default="dev.csv")
+        self.p.add_argument("--data_test", type=str, default="test.csv")
         self.p.add_argument("--asset_dir", type=str, default=f"{root}/assets/")
         self.p.add_argument("--saved_models_dir", type=str, default=f"{root}/assets/saved/")
         self.p.add_argument("--log_level", default=logging.INFO)
