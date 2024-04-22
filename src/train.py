@@ -30,8 +30,8 @@ if __name__ == "__main__":
     transformers.logging.set_verbosity_error()
 
     # ............... Load Data ................
-    TRAIN = pd.prepare_data(os.path.join(CONFIG.data_dir, CONFIG.data_train))
-    DEV = pd.prepare_data(os.path.join(CONFIG.data_dir, CONFIG.data_dev))
+    TRAIN = pd.prepare_data(os.path.join(CONFIG.data_dir, CONFIG.data_train), ratio=CONFIG.ratio)
+    DEV = pd.prepare_data(os.path.join(CONFIG.data_dir, CONFIG.data_dev), ratio=CONFIG.ratio)
 
     TRAIN, TEST = pd.split_data(TRAIN)
 

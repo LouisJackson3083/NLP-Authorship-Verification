@@ -17,6 +17,7 @@ class DefaultConfig:
         self.p.add_argument("--filter_sizes", type=int, default=[1, 2, 3])
         self.p.add_argument("--dropout", type=float, default=0.15)
         self.p.add_argument("--embedding_dim", type=float, default=128)
+        self.p.add_argument("--ratio", type=float, default=1.0)
 
         root = Path(__file__).parents[2].__str__()
         self.p.add_argument("--data_dir", type=str, default=f"{root}/data/")

@@ -43,7 +43,7 @@ def split_data(
     return train, test
 
 
-def prepare_data(csv_filepath: str) -> Dict[str, list]:
+def prepare_data(csv_filepath: str, ratio: float = 1.0) -> Dict[str, list]:
     """
     Prepares the data from csv files
     args:
@@ -60,7 +60,7 @@ def prepare_data(csv_filepath: str) -> Dict[str, list]:
     df = pd.read_csv(csv_filepath)
     # Iterate through and add to our first and second texts and labels
     # I was initially worried about this being slow but it manages to do this on the train dataset very fast
-    for i in range(len(df)):
+    for i in range(int( len(df) * ratio)):
         FIRST_TEXTS.append(df.iloc[i, 0])
         SECOND_TEXTS.append(df.iloc[i, 1])
         LABELS.append(df.iloc[i, 2])
