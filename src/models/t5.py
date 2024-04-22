@@ -57,7 +57,7 @@ class Classifier(pl.LightningModule):
     """
 
     def __init__(self,
-                 t5_model_path: str,
+                 model: str,
                  num_classes: int,
                  lr: float,
                  max_len: int,
@@ -69,7 +69,7 @@ class Classifier(pl.LightningModule):
         self.learning_rare = lr
         self.max_len = max_len
 
-        self.model = transformers.T5EncoderModel.from_pretrained(t5_model_path)
+        self.model = model
 
         self.convolution = Convolution(n_filters=n_filters, filter_sizes=filter_sizes,
                                        max_len=self.max_len, lm_model=self.model)
