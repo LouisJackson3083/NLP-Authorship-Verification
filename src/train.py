@@ -2,7 +2,7 @@ import os
 import logging
 import itertools
 import transformers
-from transformers import T5Tokenizer, AutoTokenizer, MambaModel
+from transformers import T5Tokenizer, AutoTokenizer
 from pytorch_lightning.callbacks.early_stopping import EarlyStopping
 from pytorch_lightning.loggers import CSVLogger
 import pytorch_lightning as pl
@@ -19,13 +19,6 @@ from util import write_json
 if __name__ == "__main__":
     # ............. Create Config ..............
     CONFIG = DefaultConfig().parse()
-
-    if CONFIG.mamba:
-        TOKENIZER = AutoTokenizer.from_pretrained(CONFIG.language_model_path)
-        model = transformers.MambaModel.from_pretrained(CONFIG.language_model_path)
-    else:
-        TOKENIZER = T5Tokenizer.from_pretrained(CONFIG.language_model_path)
-        model = transformers.AutoTokenizer.from_pretrained(CONFIG.language_model_path)
 
     # could change
     torch.set_float32_matmul_precision('high')
@@ -48,6 +41,10 @@ if __name__ == "__main__":
     logging.info(f"Test data size: {len(TEST['fst_texts'])}")
 
     # ............... Tokenizer ................
+    if CONFIG.mamba:
+        TOKENIZER = AutoTokenizer.from_pretrained(CONFIG.mamba_language_model_path)
+    else:
+        TOKENIZER = T5Tokenizer.from_pretrained(CONFIG.t5_language_model_path)
 
     # .......... Feature Extraction ............
     PREP_TRAIN = pd.PrepDataset(TRAIN)
@@ -87,9 +84,10 @@ if __name__ == "__main__":
 
     # ............. Create Model ...............
     MODEL = Classifier(num_classes=len(label_indexer.v2i),
-                       model=model, lr=CONFIG.lr,
+                       lr=CONFIG.lr,
                        max_len=CONFIG.max_len, filter_sizes=CONFIG.filter_sizes,
-                       n_filters=CONFIG.num_filters)
+                       n_filters=CONFIG.num_filters,
+                       config=CONFIG)
 
     # .........Train and Test Model ............
     TRAINER.fit(MODEL, datamodule=DATA_MOD)

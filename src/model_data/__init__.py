@@ -31,6 +31,7 @@ class ModelDataset(torch.utils.data.Dataset):
         return len(self.fst_texts)
 
     def _pair_tokenizer(self, fst_text: str, snd_text: str):
+        print(fst_text)
         batch = self.tokenizer.encode_plus(
             text=fst_text,
             text_pair=snd_text,

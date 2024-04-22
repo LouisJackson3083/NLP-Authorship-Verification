@@ -57,19 +57,22 @@ class Classifier(pl.LightningModule):
     """
 
     def __init__(self,
-                 model: str,
                  num_classes: int,
                  lr: float,
                  max_len: int,
                  n_filters: int,
-                 filter_sizes: List[int]):
+                 filter_sizes: List[int],
+                 config):
         super().__init__()
         self.accuracy = torchmetrics.Accuracy(task='multiclass', num_classes=num_classes)
         self.f_score_total = torchmetrics.F1Score(task='multiclass', average="weighted", num_classes=num_classes)
         self.learning_rare = lr
         self.max_len = max_len
 
-        self.model = model
+        if config.mamba:
+            self.model = transformers.MambaModel.from_pretrained(config.mamba_language_model_path)
+        else:
+            self.model = transformers.T5EncoderModel.from_pretrained(config.t5_language_model_path)
 
         self.convolution = Convolution(n_filters=n_filters, filter_sizes=filter_sizes,
                                        max_len=self.max_len, lm_model=self.model)
