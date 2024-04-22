@@ -41,10 +41,11 @@ if __name__ == "__main__":
     logging.info(f"Test data size: {len(TEST['fst_texts'])}")
 
     # ............... Tokenizer ................
-    if CONFIG.mamba:
-        TOKENIZER = AutoTokenizer.from_pretrained(CONFIG.mamba_language_model_path)
-    else:
-        TOKENIZER = T5Tokenizer.from_pretrained(CONFIG.t5_language_model_path)
+    # if CONFIG.mamba:
+    #     TOKENIZER = AutoTokenizer.from_pretrained(CONFIG.mamba_language_model_path)
+    # else:
+    #     TOKENIZER = T5Tokenizer.from_pretrained(CONFIG.t5_language_model_path)
+    TOKENIZER = T5Tokenizer.from_pretrained(CONFIG.t5_language_model_path)
 
     # .......... Feature Extraction ............
     PREP_TRAIN = pd.PrepDataset(TRAIN)
