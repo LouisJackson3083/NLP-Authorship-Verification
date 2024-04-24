@@ -85,7 +85,7 @@ class PrepDataset():
     We will do all tokenization, feature extraction within this class and it will be what we pass to the model etc.
 
     Also, some texts are invalid or aren't actually pairs, we collate a list of indexes to pop from first_texts once all
-    the pos, punctuation and info is calculated
+    the pos, punctuation is calculated
 
     Variables:
         FIRST_TEXTS - a list of the first texts,
@@ -97,8 +97,6 @@ class PrepDataset():
         SECOND_POS - a list of the second texts with the POS tagged,
         FIRST_PUNCTUATION - a list of the first texts' punctuation,
         SECOND_PUNCTUATION - a list of the second texts' punctuation,
-        FIRST_INFO - a list of the first texts' auxillary info,
-        SECOND_INFO - a list of the second texts' auxillary info,
         INVALID_INDEXES - a set of indexes that are invalid and should be popped at the end of feature extraction
     """
 
@@ -115,9 +113,6 @@ class PrepDataset():
 
         self.FIRST_PUNCTUATION = self.ExtractPunctuation(self.FIRST_TEXTS)
         self.SECOND_PUNCTUATION = self.ExtractPunctuation(self.SECOND_TEXTS)
-
-        self.FIRST_INFORMATION = self.ExtractInformation(self.FIRST_TEXTS)
-        self.SECOND_INFORMATION = self.ExtractInformation(self.SECOND_TEXTS)
 
         self.CleanUpData()
         self.prep_state = "extracted"
@@ -164,30 +159,12 @@ class PrepDataset():
 
         return PUNCTUATION
 
-    def ExtractInformation(self, TEXTS):
-        INFORMATION = []
-        pattern = r"(?<=\<).*?(?=\>)"
-
-        # Iterate through every text
-        for index, text in tqdm(enumerate(TEXTS), total=len(TEXTS),
-                                leave=False, desc="Extracting Information"):
-            try:
-                text = re.findall(pattern, text)
-                INFORMATION.append(" ".join(text))
-            except Exception:
-                self.INVALID_INDEXES.append(index)
-                INFORMATION.append([])
-
-        return INFORMATION
-
     def CleanUpData(self):
         try:  # Before we clean up, let's make sure we actually have all our lists.
             self.FIRST_POS
             self.SECOND_POS
             self.FIRST_PUNCTUATION
             self.SECOND_PUNCTUATION
-            self.FIRST_INFORMATION
-            self.SECOND_INFORMATION
         except Exception:
             print("Not every feature has been extracted. Please check your code and try again.")
             return
@@ -203,8 +180,6 @@ class PrepDataset():
             self.SECOND_POS.pop(index)
             self.FIRST_PUNCTUATION.pop(index)
             self.SECOND_PUNCTUATION.pop(index)
-            self.FIRST_INFORMATION.pop(index)
-            self.SECOND_INFORMATION.pop(index)
 
         logger.info("Cleaned up all data!")
 
@@ -228,8 +203,7 @@ class AVPREPAREDATASET(PrepDataset):
 
     def __getitem__(self, item_index):
         first_text, second_text, first_punctuations, second_punctuations, \
-        first_information, second_information, first_pos, \
-        second_pos, target = super().__getitem__(item_index)
+        first_pos, second_pos, target = super().__getitem__(item_index)
 
         text = self.pair_data_tokenizer(
             first_text, 
@@ -243,12 +217,6 @@ class AVPREPAREDATASET(PrepDataset):
             max_len=self.max_len
         )
 
-        information = self.pair_data_tokenizer(
-            first_information, 
-            second_information,
-            max_len=self.max_len
-        )
-
         pos = self.pair_data_tokenizer(
             first_pos, 
             second_pos, 
@@ -257,8 +225,7 @@ class AVPREPAREDATASET(PrepDataset):
 
         input_ids = text.input_ids.flatten()
         punctuations = punctuations.input_ids.flatten()
-        information = information.input_ids.flatten()
         pos = pos.input_ids.flatten()
 
-        return {"input_ids": input_ids, "punctuation": punctuations, "information": information,
+        return {"input_ids": input_ids, "punctuation": punctuations,
                 "pos": pos}
