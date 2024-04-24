@@ -119,7 +119,6 @@ class Classifier(pl.LightningModule):
         """
 
         label = batch['labels'].flatten()
-        print()
         outputs = self.forward(batch)
         loss = self.loss(outputs, label)
 
