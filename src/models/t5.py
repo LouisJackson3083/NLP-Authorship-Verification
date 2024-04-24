@@ -93,7 +93,7 @@ class Classifier(pl.LightningModule):
         features = torch.cat((text_features, pos_features), dim=2)
 
         # ------------------------ Attention Block -------------------------------
-        context, attn = self.attention(features, features)
+        context, attn = self.attention(features, features, features)
         output = context.permute(0, 2, 1)
         features = torch.nn.functional.max_pool1d(output, output.shape[2]).squeeze(2)
 
