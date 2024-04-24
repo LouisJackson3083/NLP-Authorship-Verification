@@ -18,7 +18,7 @@ class DefaultConfig:
         self.p.add_argument("--dropout", type=float, default=0.15)
         self.p.add_argument("--embedding_dim", type=float, default=128)
         self.p.add_argument("--ratio", type=float, default=1.0)
-        self.p.add_argument('--mamba', default=False)
+        self.p.add_argument('--model2', default=False)
         self.p.add_argument('--patience', type=int, default=7)
 
         root = Path(__file__).parents[2].__str__()
@@ -31,7 +31,7 @@ class DefaultConfig:
         self.p.add_argument("--log_level", default=logging.INFO)
         self.p.add_argument("--best_model_path_file", type=str, default=f"{root}/assets/saved/AV/best_model_path.json")
         self.p.add_argument("--t5_language_model_path", type=str, default="google-t5/t5-small")
-        self.p.add_argument("--mamba_language_model_path", type=str, default="state-spaces/mamba-130m-hf")
+        self.p.add_argument("--model2_language_model_path", type=str, default="google/recurrentgemma-2b-it")
 
     def parse(self):
         return self.p.parse_args()

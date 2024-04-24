@@ -41,9 +41,9 @@ if __name__ == "__main__":
     logging.info(f"Test data size: {len(TEST['fst_texts'])}")
 
     # ............... Tokenizer ................
-    if CONFIG.mamba:
-        TOKENIZER = T5Tokenizer.from_pretrained(CONFIG.t5_language_model_path)
-        # TOKENIZER = AutoTokenizer.from_pretrained(CONFIG.mamba_language_model_path)
+    if CONFIG.model2:
+        # TOKENIZER = T5Tokenizer.from_pretrained(CONFIG.t5_language_model_path)
+        TOKENIZER = AutoTokenizer.from_pretrained(CONFIG.model2_language_model_path)
     else:
         TOKENIZER = T5Tokenizer.from_pretrained(CONFIG.t5_language_model_path)
 
@@ -59,6 +59,8 @@ if __name__ == "__main__":
     POS_VALS = list(itertools.chain(*PREP_TRAIN.FIRST_POS + PREP_TRAIN.SECOND_POS +
                                     PREP_TEST.FIRST_POS + PREP_TEST.SECOND_POS))
     pos_indexer = indexer.Indexer(values=POS_VALS, pre=indexer.POS_PRE)
+
+    pos_indexer.save(f"{CONFIG.saved_models_dir}v2i.json", f"{CONFIG.saved_models_dir}i2v.json")
 
     PREP_TRAIN.index_data(pos_indexer, label_indexer)
     PREP_DEV.index_data(pos_indexer, label_indexer)
