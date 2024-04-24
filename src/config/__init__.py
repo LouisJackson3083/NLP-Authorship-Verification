@@ -19,6 +19,7 @@ class DefaultConfig:
         self.p.add_argument("--embedding_dim", type=float, default=128)
         self.p.add_argument("--ratio", type=float, default=1.0)
         self.p.add_argument('--mamba', default=False)
+        self.p.add_argument('--patience', type=int, default=7)
 
         root = Path(__file__).parents[2].__str__()
         self.p.add_argument("--data_dir", type=str, default=f"{root}/data/")

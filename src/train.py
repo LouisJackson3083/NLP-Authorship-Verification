@@ -74,7 +74,7 @@ if __name__ == "__main__":
     DATA_MOD.setup()
 
     # ......... Create Model Trainer ...........
-    EARLY_STOPPING_CALLBACK = EarlyStopping(monitor="val_acc", patience=7, mode="max")
+    EARLY_STOPPING_CALLBACK = EarlyStopping(monitor="val_acc", patience=CONFIG.patience, mode="max")
     CHECKPOINT_CALLBACK = build_checkpoint_callback(save_top_k=CONFIG.save_top_k,
                                                     monitor="val_acc",
                                                     mode="max",
