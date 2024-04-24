@@ -1,5 +1,5 @@
 from typing import List
-from util import write_json
+from util import write_json, read_json
 
 
 POS_PRE = {"<PAD>": 0, "<UNK>": 1}
@@ -83,3 +83,10 @@ class Indexer():
         """
         write_json(data=self.v2i, path=v2i_path)
         write_json(data=self.i2v, path=i2v_path)
+
+    @staticmethod
+    def load(v2i_path: str, i2v_path: str):
+        indexer = Indexer([])
+        indexer._v2i = [read_json(v2i_path), True]
+        indexer._i2v = [read_json(i2v_path), True]
+        return indexer

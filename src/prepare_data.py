@@ -61,14 +61,14 @@ def prepare_data(csv_filepath: str, ratio: float = 1.0, labels: bool = True) -> 
     df = pd.read_csv(csv_filepath)
     # Iterate through and add to our first and second texts and labels
     # I was initially worried about this being slow but it manages to do this on the train dataset very fast
-    for i in range(int( len(df) * ratio)):
+    for i in range(int(len(df) * ratio)):
         FIRST_TEXTS.append(df.iloc[i, 0])
         SECOND_TEXTS.append(df.iloc[i, 1])
         if (labels):
             LABELS.append(df.iloc[i, 2])
 
     # Ensure that the data is valid
-    if (labels):
+    if labels:
         assert len(FIRST_TEXTS) == len(SECOND_TEXTS) == len(LABELS)
     else:
         assert len(FIRST_TEXTS) == len(SECOND_TEXTS)
@@ -198,34 +198,3 @@ class PrepDataset():
         self.FIRST_POS_INDEXED = pos_indexer.apply_v2i(self.FIRST_POS)
         self.SECOND_POS_INDEXED = pos_indexer.apply_v2i(self.SECOND_POS)
         self.prep_state = "indexed"
-
-class AVPREPAREDATASET(PrepDataset):
-
-    def __getitem__(self, item_index):
-        first_text, second_text, first_punctuations, second_punctuations, \
-        first_pos, second_pos, target = super().__getitem__(item_index)
-
-        text = self.pair_data_tokenizer(
-            first_text, 
-            second_text, 
-            max_len=self.max_len
-        )
-
-        punctuations = self.pair_data_tokenizer(
-            first_punctuations, 
-            second_punctuations,
-            max_len=self.max_len
-        )
-
-        pos = self.pair_data_tokenizer(
-            first_pos, 
-            second_pos, 
-            max_len=self.max_len
-        )
-
-        input_ids = text.input_ids.flatten()
-        punctuations = punctuations.input_ids.flatten()
-        pos = pos.input_ids.flatten()
-
-        return {"input_ids": input_ids, "punctuation": punctuations,
-                "pos": pos}

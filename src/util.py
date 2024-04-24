@@ -18,3 +18,8 @@ def write_json(data: list or dict,
     print(convert(data))
     with open(path, "w+", encoding="utf8") as outfile:
         json.dump(convert(data), outfile, separators=(",", ":"), indent=4, ensure_ascii=False)
+
+
+def read_json(path: str) -> dict:
+    with open(path, encoding="utf-8") as json_file:
+        return json.load(json_file)
