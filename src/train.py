@@ -41,9 +41,9 @@ if __name__ == "__main__":
     logging.info(f"Test data size: {len(TEST['fst_texts'])}")
 
     # ............... Tokenizer ................
-    if CONFIG.mamba:
-        TOKENIZER = T5Tokenizer.from_pretrained(CONFIG.t5_language_model_path)
-        # TOKENIZER = AutoTokenizer.from_pretrained(CONFIG.mamba_language_model_path)
+    if CONFIG.model2:
+        # TOKENIZER = T5Tokenizer.from_pretrained(CONFIG.t5_language_model_path)
+        TOKENIZER = AutoTokenizer.from_pretrained(CONFIG.model2_language_model_path)
     else:
         TOKENIZER = T5Tokenizer.from_pretrained(CONFIG.t5_language_model_path)
 

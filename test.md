@@ -17,7 +17,7 @@ NOT ENOUGH MEMORY
 0.48
 
 ! python ./src/train.py --lr 0.001 --batch_size 32 --num_workers 16 --dropout 0.5 --num_epochs 100 --ratio 0.01
-
+GOOD APPROAC ^ HIGHER VAL ACCURACY BUT WAS ON A LOW RATIO of training data
 
 ### MAMBA
 ! python ./src/train.py --lr 0.001 --batch_size 1 --num_workers 1 --dropout 0.5 --ratio 0.005 --mamba True

@@ -69,8 +69,9 @@ class Classifier(pl.LightningModule):
         self.learning_rare = lr
         self.max_len = max_len
 
-        if config.mamba:
-            self.model = transformers.MambaModel.from_pretrained(config.mamba_language_model_path)
+        if config.model2:
+            # self.model = transformers.MambaModel.from_pretrained(config.mamba_language_model_path)
+            self.model = transformers.AutoModelForCausalLM.from_pretrained(config.model2_language_model_path, device_map="auto")
         else:
             self.model = transformers.T5EncoderModel.from_pretrained(config.t5_language_model_path)
 
