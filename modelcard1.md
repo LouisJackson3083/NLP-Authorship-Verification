@@ -77,7 +77,6 @@ The model was trained with the following parameters
 This resulted in 18 epochs taking with a time of ~4.2 min/epoch.
 <!-- This section provides information about how roughly how long it takes to train the model and the size of the resulting model. -->
 
-{{ speeds_sizes_times | default("[More Information Needed]", true)}}
 
 ## Evaluation
 The best performing model acheived:
@@ -95,19 +94,16 @@ The best performing model acheived:
 
 <!-- This should describe any evaluation data used (e.g., the development/validation set provided). -->
 
-{{ testing_data | default("[More Information Needed]", true)}}
 
 #### Metrics
 The metrics used will be acurracy and loss.
 
 <!-- These are the evaluation metrics being used. -->
 
-{{ testing_metrics | default("[More Information Needed]", true)}}
 
 ### Results
 Testing labels are not available, so we can't compute testing metrics yet.
 
-{{ results | default("[More Information Needed]", true)}}
 
 ## Technical Specifications
 
@@ -115,7 +111,6 @@ Testing labels are not available, so we can't compute testing metrics yet.
 Used: L4 TensorCore GPU on Google Colab 
 Neeeded: 15GiB RAM
 
-{{ hardware_requirements | default("[More Information Needed]", true)}} 
 ### Software
 Python3, CUDA
 
@@ -133,11 +128,9 @@ emoji
 pytorch-lightning
 ```
 
-{{ software | default("[More Information Needed]", true)}}
 
 ## Additional Information 
 
 <!-- Any other information that would be useful for other people to know. -->
 
-{{ additional_information | default("[More Information Needed]", true)}}
-
+ 
