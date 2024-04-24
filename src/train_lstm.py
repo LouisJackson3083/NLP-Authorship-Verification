@@ -13,7 +13,7 @@ from model_data.data_module import DataModule
 import indexer
 import prepare_data as pd
 from models.util import build_checkpoint_callback
-from models.t5 import Classifier
+from models.lstmcrook import CrookClassifier
 from util import write_json
 
 if __name__ == "__main__":
@@ -67,36 +67,4 @@ if __name__ == "__main__":
     PREP_DEV.index_data(pos_indexer, label_indexer)
     PREP_TEST.index_data(pos_indexer, label_indexer)
 
-    # .......... Create Data Module ............
-    DATA = {
-        "train": PREP_TRAIN,
-        "val": PREP_DEV,
-        "test": PREP_TEST,
-    }
-    DATA_MOD = DataModule(data=DATA, tokenizer=TOKENIZER, config=CONFIG)
-    DATA_MOD.setup()
-
-    # ......... Create Model Trainer ...........
-    EARLY_STOPPING_CALLBACK = EarlyStopping(monitor="val_acc", patience=CONFIG.patience, mode="max")
-    CHECKPOINT_CALLBACK = build_checkpoint_callback(save_top_k=CONFIG.save_top_k,
-                                                    monitor="val_acc",
-                                                    mode="max",
-                                                    filename="QTag-{epoch:02d}-{val_acc:.2f}")
-    TRAINER = pl.Trainer(max_epochs=CONFIG.num_epochs, accelerator="auto",
-                         callbacks=[CHECKPOINT_CALLBACK, EARLY_STOPPING_CALLBACK],
-                         logger=LOGGER)
-
-    # ............. Create Model ...............
-    MODEL = Classifier(num_classes=len(label_indexer.v2i),
-                       lr=CONFIG.lr,
-                       max_len=CONFIG.max_len, filter_sizes=CONFIG.filter_sizes,
-                       n_filters=CONFIG.num_filters,
-                       config=CONFIG)
-
-    # .........Train and Test Model ............
-    TRAINER.fit(MODEL, datamodule=DATA_MOD)
-    TRAINER.test(ckpt_path="best", datamodule=DATA_MOD)
-
-    # .... save best mt5_model_en path .........
-    write_json(path=CONFIG.best_model_path_file,
-               data={"best_model_path": CHECKPOINT_CALLBACK.best_model_path})
+    print("TRAIN:",PREP_TRAIN)

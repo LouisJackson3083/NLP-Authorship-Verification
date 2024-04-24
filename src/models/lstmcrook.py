@@ -8,53 +8,7 @@ import transformers
 
 from .attention import ScaledDotProductAttention
 
-
-class Convolution(torch.nn.Module):
-    """
-    Convolution module to extract features from author-specific and topic-specific information
-
-    Attributes:
-        n_filters: number of filters
-        filter_sizes: list of filter sizes
-        max_len: maximum length for each sample
-        lm_model: language model
-    """
-
-    def __init__(self,
-                 n_filters: int,
-                 filter_sizes: List[int],
-                 max_len: int,
-                 lm_model: transformers.T5EncoderModel.from_pretrained):
-        super().__init__()
-        self.lm_model = lm_model
-        self.convs = torch.nn.ModuleList([
-            torch.nn.Conv2d(in_channels=1,
-                            out_channels=n_filters,
-                            kernel_size=(fs, self.lm_model.config.d_model))
-            for fs in filter_sizes
-        ])
-        self.max_len = max_len
-
-        self.max_pool = torch.nn.MaxPool1d(self.max_len)
-        self.max_pool_info = torch.nn.MaxPool1d(self.max_len // 4)
-
-    def forward(self, batch):
-        outputs = self.lm_model(batch).last_hidden_state.unsqueeze(1)
-
-        outputs = [torch.nn.ReLU()(conv(outputs)).squeeze(3) for conv in self.convs]
-        # conved_n = [batch_size, n_filters, sent_len - filter_sizes[n] + 1]
-
-        outputs = [torch.nn.functional.max_pool1d(conv, conv.shape[2]).squeeze(2) for conv in outputs]
-        # pooled_n = [batch_size, n_filters]
-
-        outputs = torch.cat(outputs, dim=1)
-        return outputs
-
-
-class Classifier(pl.LightningModule):
-    """
-        Classifier
-    """
+class CrookClassifier(pl.LightningModule):
 
     def __init__(self,
                  num_classes: int,
@@ -69,7 +23,9 @@ class Classifier(pl.LightningModule):
         self.learning_rare = lr
         self.max_len = max_len
 
-        self.model = transformers.T5EncoderModel.from_pretrained(config.t5_language_model_path)
+        # self.model = transformers.T5EncoderModel.from_pretrained(config.t5_language_model_path)
+
+        self.model = torch.nn.LSTM(10, 20, 2)    
 
         self.convolution = Convolution(n_filters=n_filters, filter_sizes=filter_sizes,
                                        max_len=self.max_len, lm_model=self.model)
@@ -77,6 +33,7 @@ class Classifier(pl.LightningModule):
         self.classifier = torch.nn.Linear(2 * self.model.config.d_model +
                                           len(filter_sizes * n_filters),
                                           num_classes)
+        
         self.attention = ScaledDotProductAttention(2 * self.model.config.d_model)
 
         self.loss = torch.nn.CrossEntropyLoss()
