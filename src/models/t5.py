@@ -77,10 +77,10 @@ class Classifier(pl.LightningModule):
         self.convolution = Convolution(n_filters=n_filters, filter_sizes=filter_sizes,
                                        max_len=self.max_len, lm_model=self.model)
 
-        self.classifier = torch.nn.Linear(3 * self.model.config.d_model +
+        self.classifier = torch.nn.Linear(2 * self.model.config.d_model +
                                           len(filter_sizes * n_filters),
                                           num_classes)
-        self.attention = ScaledDotProductAttention(3 * self.model.config.d_model)
+        self.attention = ScaledDotProductAttention(2 * self.model.config.d_model)
 
         self.loss = torch.nn.CrossEntropyLoss()
         self.save_hyperparameters()
