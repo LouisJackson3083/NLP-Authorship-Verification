@@ -31,5 +31,3 @@ python3 ./src/inference
 ## Using Colab
 
 The [following](https://colab.research.google.com/drive/1dhbCc52-VFv8ZQ49u5gH5Kb7PwvPE5sB#scrollTo=df3w99OWh6os) notebook is hosted on colab. It clones the repo of this project which also contains the training and testing data. It then installs the requirements. The training script can simply be ran in this notebook. To do inference just add the model as explained in the previous part and run the inference script in the notebook.
-
-
