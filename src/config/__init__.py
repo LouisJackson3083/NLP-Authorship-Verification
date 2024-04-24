@@ -28,7 +28,7 @@ class DefaultConfig:
         self.p.add_argument("--asset_dir", type=str, default=f"{root}/assets/")
         self.p.add_argument("--saved_models_dir", type=str, default=f"{root}/assets/saved/")
         self.p.add_argument("--log_level", default=logging.INFO)
-        self.p.add_argument("--best_model_path_file", type=str, default=f"{root}/assets/saved/av/best_model_path.json")
+        self.p.add_argument("--best_model_path_file", type=str, default=f"{root}/assets/saved/AV/best_model_path.json")
         self.p.add_argument("--t5_language_model_path", type=str, default="google-t5/t5-small")
         self.p.add_argument("--mamba_language_model_path", type=str, default="state-spaces/mamba-130m-hf")
 

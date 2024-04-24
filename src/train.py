@@ -42,7 +42,8 @@ if __name__ == "__main__":
 
     # ............... Tokenizer ................
     if CONFIG.mamba:
-        TOKENIZER = AutoTokenizer.from_pretrained(CONFIG.mamba_language_model_path)
+        TOKENIZER = T5Tokenizer.from_pretrained(CONFIG.t5_language_model_path)
+        # TOKENIZER = AutoTokenizer.from_pretrained(CONFIG.mamba_language_model_path)
     else:
         TOKENIZER = T5Tokenizer.from_pretrained(CONFIG.t5_language_model_path)
 

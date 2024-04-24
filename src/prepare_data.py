@@ -8,6 +8,7 @@ import string
 import emoji
 from tqdm.autonotebook import tqdm
 import logging
+import torch
 
 # Ours
 from indexer import Indexer
@@ -43,7 +44,7 @@ def split_data(
     return train, test
 
 
-def prepare_data(csv_filepath: str, ratio: float = 1.0) -> Dict[str, list]:
+def prepare_data(csv_filepath: str, ratio: float = 1.0, labels: bool = True) -> Dict[str, list]:
     """
     Prepares the data from csv files
     args:
@@ -63,10 +64,14 @@ def prepare_data(csv_filepath: str, ratio: float = 1.0) -> Dict[str, list]:
     for i in range(int( len(df) * ratio)):
         FIRST_TEXTS.append(df.iloc[i, 0])
         SECOND_TEXTS.append(df.iloc[i, 1])
-        LABELS.append(df.iloc[i, 2])
+        if (labels):
+            LABELS.append(df.iloc[i, 2])
 
     # Ensure that the data is valid
-    assert len(FIRST_TEXTS) == len(SECOND_TEXTS) == len(LABELS)
+    if (labels):
+        assert len(FIRST_TEXTS) == len(SECOND_TEXTS) == len(LABELS)
+    else:
+        assert len(FIRST_TEXTS) == len(SECOND_TEXTS)
 
     logger.info(f"Prepared {len(df)} data points.")
     return {"fst_texts": FIRST_TEXTS, "snd_texts": SECOND_TEXTS, "labels": LABELS}
@@ -218,3 +223,42 @@ class PrepDataset():
         self.FIRST_POS_INDEXED = pos_indexer.apply_v2i(self.FIRST_POS)
         self.SECOND_POS_INDEXED = pos_indexer.apply_v2i(self.SECOND_POS)
         self.prep_state = "indexed"
+
+class AVPREPAREDATASET(PrepDataset):
+
+    def __getitem__(self, item_index):
+        first_text, second_text, first_punctuations, second_punctuations, \
+        first_information, second_information, first_pos, \
+        second_pos, target = super().__getitem__(item_index)
+
+        text = self.pair_data_tokenizer(
+            first_text, 
+            second_text, 
+            max_len=self.max_len
+        )
+
+        punctuations = self.pair_data_tokenizer(
+            first_punctuations, 
+            second_punctuations,
+            max_len=self.max_len
+        )
+
+        information = self.pair_data_tokenizer(
+            first_information, 
+            second_information,
+            max_len=self.max_len
+        )
+
+        pos = self.pair_data_tokenizer(
+            first_pos, 
+            second_pos, 
+            max_len=self.max_len
+        )
+
+        input_ids = text.input_ids.flatten()
+        punctuations = punctuations.input_ids.flatten()
+        information = information.input_ids.flatten()
+        pos = pos.input_ids.flatten()
+
+        return {"input_ids": input_ids, "punctuation": punctuations, "information": information,
+                "pos": pos}
