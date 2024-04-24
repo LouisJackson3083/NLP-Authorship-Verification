@@ -16,9 +16,6 @@ class ModelDataset(torch.utils.data.Dataset):
         self.fst_puncs = data.FIRST_PUNCTUATION
         self.snd_puncs = data.SECOND_PUNCTUATION
 
-        self.fst_infos = data.FIRST_INFORMATION
-        self.snd_infos = data.SECOND_INFORMATION
-
         self.fst_iposs = data.FIRST_POS_INDEXED
         self.snd_iposs = data.SECOND_POS_INDEXED
 
@@ -51,23 +48,18 @@ class ModelDataset(torch.utils.data.Dataset):
         snd_ipos = self.snd_iposs[index]
         fst_punc = self.fst_puncs[index]
         snd_punc = self.snd_puncs[index]
-        fst_info = self.fst_infos[index]
-        snd_info = self.snd_infos[index]
 
         text = self._pair_tokenizer(fst_text, snd_text)
         ipos = self._pair_tokenizer(fst_ipos, snd_ipos)
         punc = self._pair_tokenizer(fst_punc, snd_punc)
-        info = self._pair_tokenizer(fst_info, snd_info)
 
         inid = text.input_ids.flatten()
         ipos = ipos.input_ids.flatten()
         punc = punc.input_ids.flatten()
-        info = info.input_ids.flatten()
 
         ret = {
             "text": inid,
             "punc": punc,
-            "info": info,
             "ipos": ipos,
         }
 
